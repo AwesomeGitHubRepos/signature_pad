@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
@@ -7,12 +8,18 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "alwaysStrict": true,
+    "strict": true,
 
     "removeComments": true,
     "newLine": "LF",
 
     "lib": ["DOM", "ES2015"],
     "sourceMap": true,
-    "declaration": false
-  }
+    "inlineSources": true,
+    "rootDir": "src",
+    "declaration": true,
+    "declarationDir": "dist/types",
+    "emitDeclarationOnly": true
+  },
+  "include": ["src/signature_pad.ts"]
 }

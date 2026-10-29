@@ -1,4 +1,4 @@
-import type { PointGroup } from '../../src/signature_pad';
+import type { PointGroup } from '../../src/signature_pad.ts';
 
 export const square: PointGroup[] = [
   {
@@ -6,6 +6,8 @@ export const square: PointGroup[] = [
     dotSize: 0,
     minWidth: 0.5,
     maxWidth: 2.5,
+    velocityFilterWeight: 0.7,
+    compositeOperation: 'source-over',
     points: [
       {
         time: 1637131731972,

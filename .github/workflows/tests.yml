@@ -1,12 +1,15 @@
-name: "tests"
+name: 'tests'
 on:
   pull_request:
   push:
     branches:
       - master
+      - beta
+
+permissions:
+  contents: read
 
 jobs:
-
   Test:
     runs-on: ubuntu-latest
     strategy:
@@ -55,10 +58,15 @@ jobs:
       - name: Lint ✨
         run: yarn run lint
 
-  Docs: # Release:
+  Release:
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for trusted publishing and npm provenance
     needs: [Test, Build, Lint]
     if: |
-      github.ref == 'refs/heads/master' &&
+      (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta') &&
       github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
@@ -72,19 +80,20 @@ jobs:
       - name: Install Dependencies
         run: yarn
       - name: Build 🗜️
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          export SEMANTIC_RELEASE_NEXT_VERSION=$(npx semantic-release --no-ci --dry-run | grep -oP 'The next release version is \K[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Next Version: $SEMANTIC_RELEASE_NEXT_VERSION"
           yarn run build
           if ! git diff --quiet; then
             git config --global user.email "<>"
             git config --global user.name "GitHub Actions"
             git commit -am "📚 docs [skip ci]"
-            # remove push if using semantic-release
-            git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/szimek/signature_pad.git" HEAD:master
           else
             echo "Nothing to commit"
           fi
-      # - name: Release 🎉
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      #   run: npx semantic-release
+      - name: Release 🎉
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release

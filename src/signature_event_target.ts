@@ -1,12 +1,16 @@
-export class SignatureEventTarget implements EventTarget {
+export class SignatureEventTarget {
   /* tslint:disable: variable-name */
   private _et: EventTarget;
   /* tslint:enable: variable-name */
 
   constructor() {
     try {
-      this._et = new EventTarget();
-    } catch (error) {
+      const Target =
+        typeof window !== 'undefined' && window.EventTarget
+          ? window.EventTarget
+          : EventTarget;
+      this._et = new Target();
+    } catch {
       // Using document as EventTarget to support iOS 13 and older.
       // Because EventTarget constructor just exists at iOS 14 and later.
       this._et = document;
